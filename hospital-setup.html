@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Register Hospital — MediBoard</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span> MediBoard</div>
+  <nav><a href="hospital-login.html">Staff login</a></nav>
+</div>
+
+<div class="page narrow">
+  <div class="eyebrow">Step 1 of 2</div>
+  <h1>Register your hospital</h1>
+  <p class="subtitle">Add your hospital's profile, then create a staff login for it.</p>
+
+  <div class="card" id="hospitalCard">
+    <label for="hName">Hospital name</label>
+    <input id="hName" type="text" placeholder="City General Hospital" />
+    <label for="hAddress">Address</label>
+    <input id="hAddress" type="text" placeholder="12 Main St" />
+    <label for="hCity">City</label>
+    <input id="hCity" type="text" placeholder="Springfield" />
+    <label for="hPhone">Phone</label>
+    <input id="hPhone" type="text" placeholder="555-1000" />
+    <button onclick="createHospital()">Save hospital &amp; continue</button>
+    <div class="msg" id="hMsg" style="display:none;"></div>
+  </div>
+
+  <div class="card" id="staffCard" style="display:none; margin-top:20px;">
+    <div class="eyebrow">Step 2 of 2</div>
+    <p class="subtitle" style="margin-bottom:0;">Create a staff login for <strong id="hospitalNameLabel"></strong>.</p>
+    <label for="sUsername">Staff username</label>
+    <input id="sUsername" type="text" placeholder="staff_citygeneral" />
+    <label for="sPassword">Password</label>
+    <input id="sPassword" type="password" placeholder="••••••••" />
+    <button onclick="createStaff()">Create staff account</button>
+    <div class="msg" id="sMsg" style="display:none;"></div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+let newHospitalId = null;
+
+async function createHospital() {
+  const name = document.getElementById('hName').value.trim();
+  const address = document.getElementById('hAddress').value.trim();
+  const city = document.getElementById('hCity').value.trim();
+  const phone = document.getElementById('hPhone').value.trim();
+  const msg = document.getElementById('hMsg');
+  if (!name) return showMessage(msg, 'Hospital name is required.');
+
+  try {
+    const hospital = await apiRequest('/hospitals', 'POST', { name, address, city, phone });
+    newHospitalId = hospital.id;
+    document.getElementById('hospitalNameLabel').textContent = hospital.name;
+    document.getElementById('staffCard').style.display = 'block';
+    showMessage(msg, 'Hospital saved.', 'success');
+  } catch (e) {
+    showMessage(msg, e.message);
+  }
+}
+
+async function createStaff() {
+  const username = document.getElementById('sUsername').value.trim();
+  const password = document.getElementById('sPassword').value;
+  const msg = document.getElementById('sMsg');
+  if (!username || !password) return showMessage(msg, 'Enter a username and password.');
+
+  try {
+    await apiRequest('/auth/staff-register', 'POST', { username, password, hospitalId: newHospitalId });
+    showMessage(msg, 'Staff account created. Redirecting to login…', 'success');
+    setTimeout(() => window.location.href = 'hospital-login.html', 1200);
+  } catch (e) {
+    showMessage(msg, e.message);
+  }
+}
+</script>
+
+</body>
+</html>
