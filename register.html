@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Register - MediBoard</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#f4f7fb;
+}
+
+.topbar{
+background:#0b6efd;
+color:white;
+padding:15px 30px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.topbar a{
+color:white;
+text-decoration:none;
+margin-left:20px;
+}
+
+.container{
+width:450px;
+margin:50px auto;
+background:white;
+padding:30px;
+border-radius:10px;
+box-shadow:0 0 15px rgba(0,0,0,.15);
+}
+
+h2{
+text-align:center;
+color:#0b6efd;
+}
+
+input{
+width:100%;
+padding:12px;
+margin-top:8px;
+margin-bottom:15px;
+border:1px solid #ccc;
+border-radius:5px;
+box-sizing:border-box;
+}
+
+button{
+width:100%;
+padding:12px;
+background:#0b6efd;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+font-size:16px;
+}
+
+button:hover{
+background:#084fc7;
+}
+
+#msg{
+margin-top:20px;
+text-align:center;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="topbar">
+
+<div>
+🏥 <b>MediBoard</b>
+</div>
+
+<div>
+
+<a href="index.html">Home</a>
+
+<a href="public-login.html">Public Login</a>
+
+<a href="hospital-login.html">Staff Login</a>
+
+</div>
+
+</div>
+
+<div class="container">
+
+<h2>Create Public Account</h2>
+
+<label>Full Name</label>
+
+<input
+type="text"
+id="fullName"
+placeholder="Enter Full Name">
+
+<label>Username</label>
+
+<input
+type="text"
+id="username"
+placeholder="Choose Username">
+
+<label>Password</label>
+
+<input
+type="password"
+id="password"
+placeholder="Choose Password">
+
+<label>Phone Number</label>
+
+<input
+type="text"
+id="phone"
+placeholder="Enter Phone Number">
+
+<button onclick="registerUser()">
+
+Register
+
+</button>
+
+<p id="msg"></p>
+
+</div>
+
+<script src="js/api.js"></script>
+
+<script>
+
+async function registerUser(){
+
+let msg=document.getElementById("msg");
+
+msg.style.color="red";
+
+try{
+
+await apiRequest(
+
+"/auth/register",
+
+"POST",
+
+{
+
+fullName:document.getElementById("fullName").value,
+
+username:document.getElementById("username").value,
+
+password:document.getElementById("password").value,
+
+phone:document.getElementById("phone").value
+
+}
+
+);
+
+msg.style.color="green";
+
+msg.innerHTML="Registration Successful! Redirecting...";
+
+setTimeout(function(){
+
+window.location.href="public-login.html";
+
+},1500);
+
+}
+
+catch(e){
+
+msg.innerHTML=e.message;
+
+}
+
+}
+
+</script>
+
+</body>
+
+</html>
