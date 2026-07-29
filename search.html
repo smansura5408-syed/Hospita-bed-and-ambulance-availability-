@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search Hospitals - MediBoard</title>
+
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      background:#f4f7fb;
+      margin:0;
+    }
+
+    .topbar{
+      background:#0b5ed7;
+      color:white;
+      padding:15px 30px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    .topbar a{
+      color:white;
+      text-decoration:none;
+      margin-left:15px;
+      font-weight:bold;
+    }
+
+    .page{
+      max-width:1000px;
+      margin:30px auto;
+      padding:20px;
+    }
+
+    .search-box{
+      background:white;
+      padding:20px;
+      border-radius:10px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom:20px;
+    }
+
+    input{
+      padding:12px;
+      width:70%;
+      border:1px solid #ccc;
+      border-radius:6px;
+      font-size:16px;
+    }
+
+    button{
+      padding:12px 20px;
+      background:#0b5ed7;
+      color:white;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:16px;
+    }
+
+    button:hover{
+      background:#084298;
+    }
+
+    .hospital-card{
+      background:white;
+      padding:20px;
+      border-radius:10px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom:20px;
+    }
+
+    .hospital-card h2{
+      margin-top:0;
+      color:#0b5ed7;
+    }
+
+    .badge{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:20px;
+      background:#e8f2ff;
+      color:#0b5ed7;
+      font-weight:bold;
+      margin-right:10px;
+      margin-top:8px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="topbar">
+    <div><b>MediBoard</b></div>
+    <div>
+      <a href="index.html">Home</a>
+      <a href="public-login.html">Public Login</a>
+      <a href="hospital-login.html">Staff Login</a>
+    </div>
+  </div>
+
+  <div class="page">
+
+    <h1>Search Hospitals</h1>
+
+    <div class="search-box">
+      <input type="text" id="searchCity" placeholder="Enter city (example: Chennai)" />
+      <button onclick="searchHospital()">Search</button>
+    </div>
+
+    <div id="hospitalList"></div>
+
+  </div>
+
+  <script src="js/api.js"></script>
+
+  <script>
+
+    // Load all hospitals when page opens
+    loadHospitals();
+
+    async function loadHospitals() {
+      try {
+        const hospitals = await apiRequest("/hospitals");
+        displayHospitals(hospitals);
+      } catch (e) {
+        document.getElementById("hospitalList").innerHTML =
+          "<p>" + e.message + "</p>";
+      }
+    }
+
+    async function searchHospital() {
+      const city = document.getElementById("searchCity").value;
+
+      if (city.trim() === "") {
+        loadHospitals();
+        return;
+      }
+
+      try {
+        const hospitals = await apiRequest(
+          "/hospitals/search?city=" + city
+        );
+
+        displayHospitals(hospitals);
+
+      } catch (e) {
+        document.getElementById("hospitalList").innerHTML =
+          "<p>" + e.message + "</p>";
+      }
+    }
+
+    function displayHospitals(hospitals) {
+
+      if (hospitals.length === 0) {
+
+        document.getElementById("hospitalList").innerHTML =
+          "<h3>No hospitals found</h3>";
+
+        return;
+      }
+
+      document.getElementById("hospitalList").innerHTML =
+        hospitals.map(h => `
+
+        <div class="hospital-card">
+
+          <h2>${h.name}</h2>
+
+          <p><b>City:</b> ${h.city}</p>
+
+          <p><b>Address:</b> ${h.address}</p>
+
+          <p><b>Phone:</b> ${h.phone}</p>
+
+          <div class="badge">
+            Beds: ${h.availableBeds}/${h.totalBeds}
+          </div>
+
+          <div class="badge">
+            Ambulances: ${h.availableAmbulances}/${h.totalAmbulances}
+          </div>
+
+          <br><br>
+
+          <button onclick="requestAmbulance(${h.id})">
+            Request Ambulance
+          </button>
+
+        </div>
+
+        `).join("");
+    }
+
+    function requestAmbulance(id) {
+      window.location.href =
+        "ambulance-request.html?hospitalId=" + id;
+    }
+
+  </script>
+
+</body>
+</html>
