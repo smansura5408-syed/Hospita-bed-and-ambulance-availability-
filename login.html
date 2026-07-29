@@ -1,0 +1,65 @@
+<script src="js/api.js"></script>
+
+<script>
+
+async function staffLogin(){
+
+    console.log("Login button clicked");
+
+
+    try{
+
+        let result = await apiRequest(
+
+            "/auth/login",
+
+            "POST",
+
+            {
+                email: document.getElementById("email").value,
+
+                password: document.getElementById("password").value
+            }
+
+        );
+
+
+        console.log(result);
+
+
+        if(result.role !== "STAFF"){
+
+            alert("Staff login only");
+            return;
+
+        }
+
+
+        localStorage.setItem(
+            "staff",
+            JSON.stringify(result)
+        );
+
+
+        window.location.href="dashboard.html";
+
+
+    }
+
+
+    catch(error){
+
+        console.log(error);
+
+        alert(error.message);
+
+    }
+
+
+}
+
+</script>
+
+</body>
+
+</html>
