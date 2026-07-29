@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hospital Staff Login</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+body{
+    font-family:Arial,sans-serif;
+    background:#f4f7fb;
+}
+
+.container{
+    width:350px;
+    margin:80px auto;
+    background:white;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+    box-sizing:border-box;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    background:#007bff;
+    color:white;
+    border:none;
+    cursor:pointer;
+    border-radius:5px;
+}
+
+button:hover{
+    background:#0056b3;
+}
+
+h2{
+    text-align:center;
+}
+
+p{
+    text-align:center;
+}
+
+a{
+    text-decoration:none;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>🏥 Hospital Staff Login</h2>
+
+<input
+type="text"
+id="username"
+placeholder="Username">
+
+<input
+type="password"
+id="password"
+placeholder="Password">
+
+<button onclick="staffLogin()">
+Login
+</button>
+
+<p id="msg"></p>
+
+<br>
+
+<p>
+<a href="index.html">← Home</a>
+</p>
+
+</div>
+
+<script src="js/api.js"></script>
+
+<script>
+
+async function staffLogin(){
+
+    let username=document.getElementById("username").value;
+    let password=document.getElementById("password").value;
+
+    try{
+
+        let result=await apiRequest(
+            "/auth/login",
+            "POST",
+            {
+                username:username,
+                password:password
+            }
+        );
+
+        console.log(result);
+
+        localStorage.setItem(
+            "staff",
+            JSON.stringify(result)
+        );
+
+        document.getElementById("msg").innerHTML="Login Successful";
+
+        setTimeout(function(){
+
+            window.location.href="dashboard.html";
+
+        },1000);
+
+    }
+
+    catch(e){
+
+        document.getElementById("msg").innerHTML=e.message;
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
