@@ -1,0 +1,107 @@
+<script src="js/api.js"></script>
+
+<script>
+
+const HOSPITAL_ID = 1;
+
+let staff = JSON.parse(localStorage.getItem("staff"));
+
+if (!staff) {
+    window.location.href = "hospital-login.html";
+}
+
+document.getElementById("hospitalTitle").innerHTML = staff.fullName;
+
+function logout() {
+    localStorage.removeItem("staff");
+    window.location.href = "index.html";
+}
+
+async function loadDashboard() {
+
+    try {
+
+        const h = await apiRequest("/hospitals/" + HOSPITAL_ID);
+
+        document.getElementById("name").value = h.name || "";
+        document.getElementById("address").value = h.address || "";
+        document.getElementById("city").value = h.city || "";
+        document.getElementById("phone").value = h.phone || "";
+
+        document.getElementById("totalBeds").value = h.totalBeds || 0;
+        document.getElementById("availableBeds").value = h.availableBeds || 0;
+
+        document.getElementById("totalAmbulances").value = h.totalAmbulances || 0;
+        document.getElementById("availableAmbulances").value = h.availableAmbulances || 0;
+
+        document.getElementById("bedView").innerHTML =
+            (h.availableBeds || 0) + " / " + (h.totalBeds || 0);
+
+        document.getElementById("ambulanceView").innerHTML =
+            (h.availableAmbulances || 0) + " / " + (h.totalAmbulances || 0);
+
+    } catch (e) {
+
+        alert(e.message);
+
+    }
+
+}
+
+async function updateHospital() {
+
+    try {
+
+        await apiRequest("/hospitals/" + HOSPITAL_ID, "PUT", {
+
+            name: document.getElementById("name").value,
+            address: document.getElementById("address").value,
+            city: document.getElementById("city").value,
+            phone: document.getElementById("phone").value
+
+        });
+
+        document.getElementById("msg").innerHTML =
+            "Hospital updated successfully";
+
+    } catch (e) {
+
+        document.getElementById("msg").innerHTML = e.message;
+
+    }
+
+}
+
+async function updateAvailability() {
+
+    try {
+
+        await apiRequest("/hospitals/" + HOSPITAL_ID + "/beds", "PUT", {
+
+            totalBeds: Number(document.getElementById("totalBeds").value),
+            availableBeds: Number(document.getElementById("availableBeds").value)
+
+        });
+
+        await apiRequest("/hospitals/" + HOSPITAL_ID + "/ambulances", "PUT", {
+
+            totalAmbulances: Number(document.getElementById("totalAmbulances").value),
+            availableAmbulances: Number(document.getElementById("availableAmbulances").value)
+
+        });
+
+        alert("Updated Successfully");
+
+        loadDashboard();
+
+    } catch (e) {
+
+        alert(e.message);
+
+    }
+
+}
+
+loadDashboard();
+
+</script>
