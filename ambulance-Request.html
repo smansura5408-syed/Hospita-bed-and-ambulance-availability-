@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Ambulance Request - MediBoard</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<div class="topbar">
+
+<div class="brand">
+
+<span class="dot"></span>
+
+MediBoard
+
+</div>
+
+<nav>
+
+<a href="index.html">Home</a>
+
+<a href="search.html">Search Hospital</a>
+
+</nav>
+
+</div>
+
+<div class="page">
+
+<h1>Ambulance Request</h1>
+
+<div class="card">
+
+<label>Hospital ID</label>
+
+<input
+type="number"
+id="hospitalId"
+readonly>
+
+<br><br>
+
+<label>Patient Name</label>
+
+<input
+type="text"
+id="patientName"
+placeholder="Enter Patient Name">
+
+<br><br>
+
+<label>Pickup Address</label>
+
+<input
+type="text"
+id="pickupAddress"
+placeholder="Enter Pickup Address">
+
+<br><br>
+
+<label>Contact Number</label>
+
+<input
+type="text"
+id="contactPhone"
+placeholder="Enter Contact Number">
+
+<br><br>
+
+<button onclick="sendRequest()">
+
+Request Ambulance
+
+</button>
+
+<div
+id="msg"
+class="msg">
+
+</div>
+
+</div>
+
+</div>
+
+<script src="js/api.js"></script>
+
+<script>
+
+const params=new URLSearchParams(window.location.search);
+
+const hospitalId=params.get("hospitalId");
+
+document.getElementById("hospitalId").value=hospitalId;
+
+async function sendRequest(){
+
+const msg=document.getElementById("msg");
+
+try{
+
+await apiRequest(
+
+"/ambulance-requests",
+
+"POST",
+
+{
+
+hospitalId:Number(document.getElementById("hospitalId").value),
+
+patientName:document.getElementById("patientName").value,
+
+pickupAddress:document.getElementById("pickupAddress").value,
+
+contactPhone:document.getElementById("contactPhone").value
+
+}
+
+);
+
+showMessage(
+
+msg,
+
+"Ambulance Request Sent Successfully",
+
+"success"
+
+);
+
+document.getElementById("patientName").value="";
+
+document.getElementById("pickupAddress").value="";
+
+document.getElementById("contactPhone").value="";
+
+}
+
+catch(e){
+
+showMessage(
+
+msg,
+
+e.message,
+
+"error"
+
+);
+
+}
+
+}
+
+</script>
+
+</body>
+
+</html>
