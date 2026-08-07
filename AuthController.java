@@ -1,47 +1,67 @@
 package com.hospital.app.controller;
 
+import org.springframework.web.bind.annotation.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.web.bind.annotation.*;
-
-import com.hospital.app.entity.User;
-import com.hospital.app.repository.UserRepository;
-
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins="*")
 public class AuthController {
 
-    private final UserRepository userRepository;
+   @PostMapping("/login")
+public Map<String, Object> login(@RequestBody LoginRequest request) {
 
-    public AuthController(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    Map<String, Object> response = new HashMap<>();
 
-    @PostMapping("/login")
-    public Map<String, Object> login(@RequestBody Map<String, String> data) {
+    // STAFF LOGIN
+    if ("Saranya ".equals(request.getUsername())
+            && "29022008".equals(request.getPassword())) {
 
-        String username = data.get("username");
-        String password = data.get("password");
-
-        User user = userRepository.findByUsername(username);
-
-        if (user == null || !user.getPassword().equals(password)) {
-            throw new RuntimeException("Invalid Username or Password");
-        }
-
-        Map<String, Object> response = new HashMap<>();
-
-        response.put("id", user.getId());
-        response.put("username", user.getUsername());
-        response.put("name", user.getName());
-        response.put("role", user.getRole());
-
-        // Temporary values until Hospital table is linked
+        response.put("username", "Saranya Hospital");
         response.put("hospitalId", 1);
         response.put("hospitalName", "Saranya Hospital");
+        response.put("role", "STAFF");
 
         return response;
+    }
+
+    // PUBLIC LOGIN
+    if ("Arun".equals(request.getUsername())
+            && "1234".equals(request.getPassword())) {
+
+        response.put("username", "Public User");
+        response.put("role", "PUBLIC");
+
+        return response;
+    }
+
+    response.put("message", "Invalid username or password");
+    response.put("role", "NONE");
+
+    return response;
+}
+
+    public static class LoginRequest {
+
+        private String username;
+        private String password;
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
     }
 }
