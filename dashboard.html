@@ -1,107 +1,895 @@
-<script src="js/api.js"></script>
+<!DOCTYPE html>
+<html lang="en">
 
-<script>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-const HOSPITAL_ID = 1;
+<title>MediBoard - Staff Dashboard</title>
 
-let staff = JSON.parse(localStorage.getItem("staff"));
+<style>
 
-if (!staff) {
-    window.location.href = "hospital-login.html";
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI', sans-serif;
 }
 
-document.getElementById("hospitalTitle").innerHTML = staff.fullName;
-
-function logout() {
-    localStorage.removeItem("staff");
-    window.location.href = "index.html";
+body{
+    background:#f4f8fb;
 }
 
-async function loadDashboard() {
 
-    try {
+/* Header */
 
-        const h = await apiRequest("/hospitals/" + HOSPITAL_ID);
+.header{
+    background:#0077b6;
+    color:white;
+    padding:18px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
 
-        document.getElementById("name").value = h.name || "";
-        document.getElementById("address").value = h.address || "";
-        document.getElementById("city").value = h.city || "";
-        document.getElementById("phone").value = h.phone || "";
+.header h1{
+    font-size:28px;
+}
 
-        document.getElementById("totalBeds").value = h.totalBeds || 0;
-        document.getElementById("availableBeds").value = h.availableBeds || 0;
+.logout{
+    background:white;
+    color:#0077b6;
+    border:none;
+    padding:10px 18px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
 
-        document.getElementById("totalAmbulances").value = h.totalAmbulances || 0;
-        document.getElementById("availableAmbulances").value = h.availableAmbulances || 0;
 
-        document.getElementById("bedView").innerHTML =
-            (h.availableBeds || 0) + " / " + (h.totalBeds || 0);
+/* Main container */
 
-        document.getElementById("ambulanceView").innerHTML =
-            (h.availableAmbulances || 0) + " / " + (h.totalAmbulances || 0);
+.container{
+    padding:30px;
+}
 
-    } catch (e) {
 
-        alert(e.message);
+/* Welcome */
+
+.welcome{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom:25px;
+}
+
+
+/* Cards */
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+}
+
+
+.card{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+    text-align:center;
+}
+
+
+.card h2{
+    color:#0077b6;
+    font-size:35px;
+}
+
+
+.card p{
+    margin-top:10px;
+    font-size:18px;
+}
+
+
+
+/* Sections */
+
+.section{
+    background:white;
+    margin-top:30px;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+
+.section h2{
+    margin-bottom:20px;
+    color:#023e8a;
+}
+
+
+
+/* Form */
+
+.form-group{
+    margin-bottom:15px;
+}
+
+
+label{
+    display:block;
+    margin-bottom:5px;
+    font-weight:bold;
+}
+
+
+input,select{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+}
+
+
+button{
+    background:#0077b6;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+
+button:hover{
+    background:#023e8a;
+}
+
+
+
+/* Table */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+
+th{
+    background:#0077b6;
+    color:white;
+    padding:12px;
+}
+
+
+td{
+    padding:12px;
+    border-bottom:1px solid #ddd;
+    text-align:center;
+}
+
+
+
+/* Status */
+
+.available{
+    color:green;
+    font-weight:bold;
+}
+
+
+.full{
+    color:red;
+    font-weight:bold;
+}
+
+
+
+/* Ambulance */
+
+.ambulance-box{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+}
+
+
+.ambulance-card{
+    background:#f8f9fa;
+    padding:20px;
+    border-radius:12px;
+    border-left:5px solid #0077b6;
+}
+
+
+
+@media(max-width:600px){
+
+.container{
+    padding:15px;
+}
+
+.header h1{
+    font-size:20px;
+}
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="header">
+
+<h1>🏥 MediBoard Staff Dashboard</h1>
+
+<button class="logout" onclick="logout()">
+Logout
+</button>
+
+</div>
+
+
+
+<div class="container">
+
+
+<div class="welcome">
+
+<h2>
+Welcome, Hospital Staff
+</h2>
+
+<p>
+Manage hospital beds and ambulance requests easily.
+</p>
+
+</div>
+
+
+
+<div class="cards">
+
+
+<div class="card">
+
+<h2 id="totalBeds">
+0
+</h2>
+
+<p>
+Total Beds
+</p>
+
+</div>
+
+
+
+<div class="card">
+
+<h2 id="availableBeds">
+0
+</h2>
+
+<p>
+Available Beds
+</p>
+
+</div>
+
+
+
+<div class="card">
+
+<h2 id="ambulanceCount">
+0
+</h2>
+
+<p>
+Available Ambulances
+</p>
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="section">
+
+<div class="section">
+
+<h2>Hospital Details</h2>
+
+<div class="form-group">
+<label>Hospital Name</label>
+<input type="text" id="name">
+</div>
+
+<div class="form-group">
+<label>Address</label>
+<input type="text" id="address">
+</div>
+
+<div class="form-group">
+<label>City</label>
+<input type="text" id="city">
+</div>
+
+<div class="form-group">
+<label>Phone</label>
+<input type="text" id="phone">
+</div>
+
+<button onclick="updateHospital()">
+Update Hospital
+</button>
+
+</div>
+
+<h2>
+Update Availability
+</h2>
+
+
+
+<div class="form-group">
+
+<label>
+Available Beds
+</label>
+
+<input type="number" id="bedsInput">
+
+</div>
+<div class="form-group">
+
+<label>
+Available Ambulances
+</label>
+
+<input
+type="number"
+id="ambulanceInput">
+
+</div>
+
+
+
+<button onclick="updateAvailability()">
+Update
+</button>
+
+
+</div>
+
+
+
+
+
+<div class="section">
+
+
+<h2>
+Hospital Bed Details
+</h2>
+
+
+<table>
+
+
+<thead>
+
+<tr>
+
+<th>
+Hospital Name
+</th>
+
+
+<th>
+Location
+</th>
+
+
+<th>
+Total Beds
+</th>
+
+
+<th>
+Available Beds
+</th>
+
+
+<th>
+Status
+</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+<tbody id="hospitalTable">
+
+
+</tbody>
+
+
+
+</table>
+
+
+</div>
+
+
+
+
+
+<div class="section">
+
+
+<h2>
+Ambulance Requests
+</h2>
+
+
+<table>
+
+
+<thead>
+
+<tr>
+
+<th>
+Patient Name
+</th>
+
+
+<th>
+Location
+</th>
+
+
+<th>
+Status
+</th>
+
+
+<th>
+Action
+</th>
+
+
+</tr>
+
+
+</thead>
+
+
+<tbody id="ambulanceTable">
+
+
+</tbody>
+
+
+</table>
+
+
+
+</div>
+
+
+</div>
+
+
+<!-- JavaScript will be added in Part 2 -->
+ <script>
+
+const BASE_URL = "http://localhost:8081";
+
+
+// Check staff login
+
+window.onload = function(){
+
+    let staff = localStorage.getItem("staff");
+
+    if(!staff){
+
+        alert("Please login first");
+
+        window.location.href="hospital-login.html";
+
+        return;
+
+    }
+
+
+    loadHospitalDetails();
+
+};
+
+
+
+
+
+// Load hospital details from backend
+
+async function loadHospitalDetails(){
+
+    try{
+
+        let response = await fetch(BASE_URL + "/hospitals");
+
+        let hospitals = await response.json();
+
+        let table = document.getElementById("hospitalTable");
+        table.innerHTML = "";
+
+        let totalBeds = 0;
+        let availableBeds = 0;
+        let totalAmbulances = 0;
+
+        hospitals.forEach(hospital=>{
+
+            totalBeds += hospital.totalBeds || 0;
+            availableBeds += hospital.availableBeds || 0;
+            totalAmbulances += hospital.availableAmbulances || 0;
+
+            let status = hospital.availableBeds > 0
+                ? "Available"
+                : "Full";
+
+            table.innerHTML += `
+
+            <tr>
+
+                <td>${hospital.name}</td>
+
+                <td>${hospital.city}</td>
+
+                <td>${hospital.totalBeds}</td>
+
+                <td>${hospital.availableBeds}</td>
+
+                <td class="${hospital.availableBeds > 0 ? 'available' : 'full'}">
+                    ${status}
+                </td>
+
+            </tr>
+
+            `;
+
+        });
+
+        document.getElementById("totalBeds").innerText = totalBeds;
+        document.getElementById("availableBeds").innerText = availableBeds;
+        document.getElementById("ambulanceCount").innerText = totalAmbulances;
+        if(hospitals.length > 0){
+
+    document.getElementById("bedsInput").value =
+    hospitals[0].availableBeds;
+
+    document.getElementById("ambulanceInput").value =
+    hospitals[0].availableAmbulances;
+
+}
+
+    }
+    catch(error){
+
+        console.log(error);
+        alert("Backend connection failed");
 
     }
 
 }
+
+
+
+
+
+
+
+// Update beds
 
 async function updateHospital() {
 
-    try {
-
-        await apiRequest("/hospitals/" + HOSPITAL_ID, "PUT", {
-
-            name: document.getElementById("name").value,
-            address: document.getElementById("address").value,
-            city: document.getElementById("city").value,
-            phone: document.getElementById("phone").value
-
-        });
-
-        document.getElementById("msg").innerHTML =
-            "Hospital updated successfully";
-
-    } catch (e) {
-
-        document.getElementById("msg").innerHTML = e.message;
-
-    }
-
-}
-
-async function updateAvailability() {
+    let staff = JSON.parse(localStorage.getItem("staff"));
+    let hospitalId = staff.hospitalId || 1;
 
     try {
 
-        await apiRequest("/hospitals/" + HOSPITAL_ID + "/beds", "PUT", {
+        await fetch(BASE_URL + "/hospitals/" + hospitalId, {
 
-            totalBeds: Number(document.getElementById("totalBeds").value),
-            availableBeds: Number(document.getElementById("availableBeds").value)
+            method: "PUT",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                name: document.getElementById("name").value,
+                address: document.getElementById("address").value,
+                city: document.getElementById("city").value,
+                phone: document.getElementById("phone").value
+
+            })
 
         });
 
-        await apiRequest("/hospitals/" + HOSPITAL_ID + "/ambulances", "PUT", {
+        alert("Hospital details updated successfully");
 
-            totalAmbulances: Number(document.getElementById("totalAmbulances").value),
-            availableAmbulances: Number(document.getElementById("availableAmbulances").value)
+        loadHospitalDetails();
 
-        });
+    } catch (error) {
 
-        alert("Updated Successfully");
+        console.log(error);
+        alert("Update failed");
 
-        loadDashboard();
+    }
+}
 
-    } catch (e) {
+async function updateAvailability(){
 
-        alert(e.message);
+    let beds = document.getElementById("bedsInput").value;
+    let ambulances = document.getElementById("ambulanceInput").value;
+
+    if(beds==="" || ambulances===""){
+
+        alert("Please enter both bed and ambulance availability.");
+        return;
 
     }
 
+    let staff = JSON.parse(localStorage.getItem("staff"));
+    let hospitalId = staff.hospitalId || 1;
+
+    try{
+
+        await fetch(BASE_URL + "/hospitals/" + hospitalId + "/beds",{
+
+            method:"PUT",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+                totalBeds:Number(document.getElementById("totalBeds").innerText),
+                availableBeds:Number(beds)
+
+            })
+
+        });
+
+        await fetch(BASE_URL + "/hospitals/" + hospitalId + "/ambulances",{
+
+            method:"PUT",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+                totalAmbulances:Number(document.getElementById("ambulanceCount").innerText),
+                availableAmbulances:Number(ambulances)
+
+            })
+
+        });
+
+        alert("Availability Updated Successfully");
+
+        loadHospitalDetails();
+
+    }
+    catch(error){
+
+        console.log(error);
+        alert("Update Failed");
+
+    }
 }
 
-loadDashboard();
+
+
+
+// Logout function
+
+
+function logout(){
+
+
+    localStorage.removeItem("staff");
+
+
+    window.location.href="hospital-login.html";
+
+
+}
+
+
 
 </script>
+<script>
+
+
+// Load ambulance requests
+
+async function loadAmbulanceRequests(){
+
+    try{
+
+        let response = await fetch(
+            BASE_URL + "/ambulance/requests"
+        );
+
+        let requests = await response.json();
+
+        let table = document.getElementById("ambulanceTable");
+
+        table.innerHTML = "";
+
+        document.getElementById("ambulanceCount").innerText = requests.length;
+
+        requests.forEach(request=>{
+
+            table.innerHTML += `
+
+            <tr>
+
+                <td>${request.patientName}</td>
+
+                <td>${request.pickupLocation}</td>
+
+                <td>${request.status}</td>
+
+                <td>
+
+                    ${
+                        request.status === "Pending"
+                        ?
+                        `<button onclick="acceptAmbulance(${request.id})">
+                            Accept
+                        </button>`
+                        :
+                        "Accepted"
+                    }
+
+                </td>
+
+            </tr>
+
+            `;
+
+        });
+
+    }
+    catch(error){
+
+        console.log(error);
+        alert("Unable to load ambulance requests");
+
+    }
+
+}
+
+
+
+
+
+
+
+
+// Accept ambulance request
+
+
+async function acceptAmbulance(id){
+
+    try{
+
+        let response = await fetch(
+
+            BASE_URL + "/ambulance/" + id,
+
+            {
+
+                method:"PUT",
+
+                headers:{
+                    "Content-Type":"application/json"
+                },
+
+                body:JSON.stringify({
+                    status:"Accepted"
+                })
+
+            }
+
+        );
+
+        if(response.ok){
+
+            alert("Ambulance Accepted");
+
+            loadAmbulanceRequests();
+
+        }
+        else{
+
+            alert("Unable to accept request");
+
+        }
+
+    }
+    catch(error){
+
+        console.log(error);
+
+        alert("Server Error");
+
+    }
+
+}
+// Auto load ambulance data
+setInterval(() => {
+
+    loadAmbulanceRequests();
+
+}, 5000);
+
+// Initial loading
+loadAmbulanceRequests();
+
+
+
+
+
+// Auto load ambulance data
+
+
+setInterval(()=>{
+
+
+    loadAmbulanceRequests();
+
+
+},5000);
+
+
+
+
+
+// Initial loading
+
+loadAmbulanceRequests();
+
+
+
+</script>
+
+</body>
+
+</html>
