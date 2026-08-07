@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Public Dashboard - MediBoard</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f4f7fb;
+}
+
+
+.topbar{
+
+    background:#0b6efd;
+    color:white;
+    padding:15px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+}
+
+
+.topbar a{
+
+    color:white;
+    text-decoration:none;
+    cursor:pointer;
+
+}
+
+
+
+.container{
+
+    width:800px;
+    margin:40px auto;
+
+}
+
+
+
+.card{
+
+    background:white;
+    padding:30px;
+    border-radius:10px;
+    box-shadow:0 2px 10px #ccc;
+    margin-bottom:20px;
+
+}
+
+
+
+h1{
+
+    color:#0b6efd;
+
+}
+
+
+
+button{
+
+    background:#0b6efd;
+    color:white;
+    border:none;
+    padding:12px 25px;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:16px;
+
+}
+
+
+button:hover{
+
+    background:#084fc7;
+
+}
+
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="topbar">
+
+
+<h3>
+🏥 MediBoard
+</h3>
+
+
+<a onclick="logout()">
+Logout
+</a>
+
+
+</div>
+
+
+
+
+<div class="container">
+
+
+<div class="card">
+
+
+<h1>
+Welcome <span id="username"></span>
+</h1>
+
+
+<p>
+Search hospitals and check real-time bed and ambulance availability.
+</p>
+
+
+
+<button onclick="searchHospital()">
+
+Search Hospitals
+
+</button>
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+<script>
+
+
+let user = JSON.parse(localStorage.getItem("publicUser"));
+
+
+
+if(!user){
+
+    window.location.href="public-login.html";
+
+}
+
+
+
+document.getElementById("username").innerHTML =
+user.username || "User";
+
+
+
+
+function searchHospital(){
+
+    // same folder file opening
+    window.location.href="search-hospital.html";
+
+}
+
+
+
+
+function logout(){
+
+    localStorage.removeItem("publicUser");
+
+    window.location.href="index.html";
+
+}
+
+
+
+</script>
+
+
+
+</body>
+
+</html>
