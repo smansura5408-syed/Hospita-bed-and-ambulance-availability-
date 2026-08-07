@@ -105,24 +105,40 @@ async function publicLogin(){
 
     try{
 
-        const result=await apiRequest("/auth/login","POST",{
+        const result = await apiRequest(
+            "/auth/login",
+            {
+                method:"POST",
 
-            username:username,
-            password:password
+                body:JSON.stringify({
 
-        });
+                    username:username,
+                    password:password
+
+                })
+            }
+        );
+
 
         if(result.role!=="PUBLIC"){
 
-            document.getElementById("msg").innerHTML="Please login using a Public account.";
+            document.getElementById("msg").innerHTML =
+            "Please login using a Public account.";
 
             return;
 
         }
 
-        localStorage.setItem("publicUser",JSON.stringify(result));
 
-        document.getElementById("msg").innerHTML="Login Successful";
+        localStorage.setItem(
+            "publicUser",
+            JSON.stringify(result)
+        );
+
+
+        document.getElementById("msg").innerHTML =
+        "Login Successful";
+
 
         setTimeout(function(){
 
@@ -130,11 +146,12 @@ async function publicLogin(){
 
         },1000);
 
-    }
 
+    }
     catch(e){
 
-        document.getElementById("msg").innerHTML=e.message;
+        document.getElementById("msg").innerHTML =
+        e.message;
 
     }
 
