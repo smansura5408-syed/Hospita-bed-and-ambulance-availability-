@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Staff Dashboard - MediBoard</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f4f7fb;
+}
+
+
+.topbar{
+    background:#0b6efd;
+    color:white;
+    padding:15px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+
+.topbar a{
+    color:white;
+    text-decoration:none;
+    margin-left:20px;
+    cursor:pointer;
+}
+
+
+.page{
+    max-width:1000px;
+    margin:30px auto;
+    padding:20px;
+}
+
+
+.card{
+    background:white;
+    padding:25px;
+    border-radius:10px;
+    margin-bottom:20px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.15);
+}
+
+
+h1,h2{
+    color:#0b6efd;
+}
+
+
+input{
+    width:100%;
+    padding:12px;
+    margin:8px 0 15px;
+    border:1px solid #ccc;
+    border-radius:5px;
+    box-sizing:border-box;
+}
+
+
+button{
+    padding:12px 20px;
+    background:#0b6efd;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    margin-top:10px;
+}
+
+
+button:hover{
+    background:#084fc7;
+}
+
+
+.stats{
+    display:flex;
+    gap:20px;
+}
+
+
+.stat-box{
+    flex:1;
+    background:#eaf3ff;
+    padding:20px;
+    border-radius:10px;
+    text-align:center;
+}
+
+
+.stat-box h3{
+    color:#0b6efd;
+}
+
+
+.hospital{
+    background:#eaf3ff;
+    padding:20px;
+    border-radius:10px;
+    margin-top:15px;
+}
+
+
+.accept{
+    background:green;
+    margin-right:10px;
+}
+
+
+.reject{
+    background:red;
+}
+
+
+#msg{
+    color:green;
+    font-weight:bold;
+}
+
+
+</style>
+
+</head>
+<body>
+
+
+<div class="topbar">
+
+<div>
+
+🏥 <b>MediBoard Staff Dashboard</b>
+
+</div>
+
+
+<div>
+
+<a href="index.html">Home</a>
+
+<a onclick="logout()">Logout</a>
+
+</div>
+
+</div>
+
+
+
+<div class="page">
+
+
+
+<h1>
+Welcome,
+<span id="hospitalTitle"></span>
+</h1>
+
+
+
+
+<div class="stats">
+
+
+<div class="stat-box">
+
+<h3>Beds</h3>
+
+<p id="bedView">0 / 0</p>
+
+</div>
+
+
+
+<div class="stat-box">
+
+<h3>Ambulances</h3>
+
+<p id="ambulanceView">0 / 0</p>
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+<div class="card">
+
+
+<h2>Hospital Details</h2>
+
+
+<label>Hospital Name</label>
+
+<input id="name">
+
+
+
+<label>Address</label>
+
+<input id="address">
+
+
+
+<label>City</label>
+
+<input id="city">
+
+
+
+<label>Phone</label>
+
+<input id="phone">
+
+
+
+<button onclick="updateHospital()">
+
+Update Hospital
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="card">
+
+
+<h2>Availability Update</h2>
+
+
+
+<label>Total Beds</label>
+
+<input id="totalBeds" type="number">
+
+
+
+<label>Available Beds</label>
+
+<input id="availableBeds" type="number">
+
+
+
+<label>Total Ambulances</label>
+
+<input id="totalAmbulances" type="number">
+
+
+
+<label>Available Ambulances</label>
+
+<input id="availableAmbulances" type="number">
+
+
+
+<button onclick="updateAvailability()">
+
+Update Availability
+
+</button>
+
+
+
+<p id="msg"></p>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="card">
+
+
+<h2>🚑 Ambulance Requests</h2>
+
+
+
+<div id="requests">
+
+Loading...
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+</div>
+<script src="js/api.js"></script>
+
+<script>
+
+
+let staff = JSON.parse(localStorage.getItem("staff"));
+
+
+if(!staff){
+
+    window.location.href="hospital-login.html";
+
+}
+
+
+
+const HOSPITAL_ID = staff.hospitalId;
+
+
+
+document.getElementById("hospitalTitle").innerHTML =
+staff.hospitalName || staff.fullName || staff.username;
+
+
+
+
+
+function logout(){
+
+    localStorage.removeItem("staff");
+
+    window.location.href="index.html";
+
+}
+
+
+
+
+
+
+async function loadDashboard(){
+
+
+    try{
+
+
+        let h = await apiRequest(
+
+            "/hospitals/" + HOSPITAL_ID
+
+        );
+
+
+
+        document.getElementById("name").value =
+        h.name || "";
+
+
+
+        document.getElementById("address").value =
+        h.address || "";
+
+
+
+        document.getElementById("city").value =
+        h.city || "";
+
+
+
+        document.getElementById("phone").value =
+        h.phone || "";
+
+
+
+
+
+        document.getElementById("totalBeds").value =
+        h.totalBeds || 0;
+
+
+
+        document.getElementById("availableBeds").value =
+        h.availableBeds || 0;
+
+
+
+
+        document.getElementById("totalAmbulances").value =
+        h.totalAmbulances || 0;
+
+
+
+        document.getElementById("availableAmbulances").value =
+        h.availableAmbulances || 0;
+
+
+
+
+
+        document.getElementById("bedView").innerHTML =
+
+        h.availableBeds + " / " + h.totalBeds;
+
+
+
+
+
+        document.getElementById("ambulanceView").innerHTML =
+
+        h.availableAmbulances + " / " + h.totalAmbulances;
+
+
+
+    }
+
+
+    catch(error){
+
+
+        alert(error.message);
+
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
+async function updateHospital(){
+
+
+    try{
+
+
+        await apiRequest(
+
+
+            "/hospitals/" + HOSPITAL_ID,
+
+
+            {
+
+
+                method:"PUT",
+
+
+                body:JSON.stringify({
+
+
+                    name:
+                    document.getElementById("name").value,
+
+
+                    address:
+                    document.getElementById("address").value,
+
+
+                    city:
+                    document.getElementById("city").value,
+
+
+                    phone:
+                    document.getElementById("phone").value
+
+
+                })
+
+
+            }
+
+
+        );
+
+
+
+        document.getElementById("msg").innerHTML =
+
+        "Hospital updated successfully";
+
+
+
+        loadDashboard();
+
+
+
+    }
+
+
+    catch(error){
+
+
+        alert(error.message);
+
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
+async function updateAvailability(){
+
+
+    try{
+
+
+        await apiRequest(
+
+
+            "/hospitals/" + HOSPITAL_ID + "/beds",
+
+
+            {
+
+
+                method:"PUT",
+
+
+                body:JSON.stringify({
+
+
+
+                    totalBeds:Number(
+
+                    document.getElementById("totalBeds").value
+
+                    ),
+
+
+
+
+                    availableBeds:Number(
+
+                    document.getElementById("availableBeds").value
+
+                    )
+
+
+                })
+
+
+            }
+
+
+        );
+
+
+
+
+
+        await apiRequest(
+
+
+            "/hospitals/" + HOSPITAL_ID + "/ambulances",
+
+
+            {
+
+
+                method:"PUT",
+
+
+                body:JSON.stringify({
+
+
+
+                    totalAmbulances:Number(
+
+                    document.getElementById("totalAmbulances").value
+
+                    ),
+
+
+
+
+                    availableAmbulances:Number(
+
+                    document.getElementById("availableAmbulances").value
+
+                    )
+
+
+                })
+
+
+            }
+
+
+        );
+
+
+
+        alert("Availability Updated Successfully");
+
+
+
+        loadDashboard();
+
+
+
+    }
+
+
+    catch(error){
+
+
+        alert(error.message);
+
+
+    }
+
+
+}
+async function loadAmbulanceRequests(){
+
+
+    try{
+
+
+        let requests = await apiRequest(
+
+            "/ambulance/hospital/" + HOSPITAL_ID
+
+        );
+
+
+
+        let output = "";
+
+
+
+        if(requests.length === 0){
+
+
+            output = "<p>No ambulance requests.</p>";
+
+
+        }
+
+        else{
+
+
+            requests.forEach(r => {
+
+
+                output += `
+
+
+                <div class="hospital">
+
+
+                    <h3>🚑 Request #${r.id}</h3>
+
+
+                    <p>
+                    <b>Patient:</b> ${r.patientName}
+                    </p>
+
+
+                    <p>
+                    <b>Phone:</b> ${r.phone}
+                    </p>
+
+
+                    <p>
+                    <b>Pickup Location:</b> ${r.pickupLocation}
+                    </p>
+
+
+                    <p>
+                    <b>Status:</b> ${r.status}
+                    </p>
+
+
+
+                    <button class="accept"
+                    onclick="updateRequest(${r.id},'Accepted')">
+
+                    Accept
+
+                    </button>
+
+
+
+                    <button class="reject"
+                    onclick="updateRequest(${r.id},'Rejected')">
+
+                    Reject
+
+                    </button>
+
+
+
+                </div>
+
+
+                `;
+
+
+            });
+
+
+        }
+
+
+
+        document.getElementById("requests").innerHTML =
+        output;
+
+
+
+    }
+
+
+    catch(error){
+
+
+        console.log(error);
+
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
+async function updateRequest(id,status){
+
+
+    try{
+
+
+        await apiRequest(
+
+
+            "/ambulance/" + id,
+
+
+            {
+
+
+                method:"PUT",
+
+
+                body:JSON.stringify({
+
+                    status:status
+
+                })
+
+
+            }
+
+
+        );
+
+
+
+        alert("Request Updated Successfully");
+
+
+
+        loadAmbulanceRequests();
+
+
+
+    }
+
+
+    catch(error){
+
+
+        alert(error.message);
+
+
+    }
+
+
+}
+
+
+
+
+
+
+loadDashboard();
+
+
+loadAmbulanceRequests();
+
+
+
+
+</script>
+
+
+</body>
+
+</html>
