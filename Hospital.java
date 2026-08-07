@@ -9,20 +9,25 @@ public class Hospital {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name="hospital_name")
     private String name;
 
+    @Column(name="address")
     private String address;
 
+    @Column(name="city")
     private String city;
 
+    @Column(name="phone")
     private String phone;
 
-    private int totalBeds;
+    @Column(name="location")
+    private String location;
 
+    private int totalBeds;
     private int availableBeds;
 
     private int totalAmbulances;
-
     private int availableAmbulances;
 
     public Integer getId() {
@@ -63,6 +68,14 @@ public class Hospital {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public int getTotalBeds() {
