@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambulance Request</title>
+
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            background:#f2f2f2;
+            margin:0;
+            padding:0;
+        }
+
+        .container{
+            width:400px;
+            margin:60px auto;
+            background:white;
+            padding:25px;
+            border-radius:10px;
+            box-shadow:0 0 10px rgba(0,0,0,0.2);
+        }
+
+        h2{
+            text-align:center;
+            color:#0d6efd;
+        }
+
+        input{
+            width:100%;
+            padding:10px;
+            margin:10px 0;
+            border:1px solid #ccc;
+            border-radius:5px;
+            box-sizing:border-box;
+        }
+
+        button{
+            width:100%;
+            padding:10px;
+            margin-top:10px;
+            border:none;
+            border-radius:5px;
+            cursor:pointer;
+            color:white;
+            font-size:16px;
+        }
+
+        .send{
+            background:#198754;
+        }
+
+        .logout{
+            background:#dc3545;
+        }
+    </style>
+
+</head>
+
+<body>
+
+
+<div class="container">
+
+    <h2>🚑 Ambulance Request</h2>
+
+    <input 
+        type="text" 
+        id="patientName" 
+        placeholder="Patient Name">
+
+    <input 
+        type="text" 
+        id="phone" 
+        placeholder="Phone Number">
+
+    <input 
+        type="text" 
+        id="pickupLocation" 
+        placeholder="Pickup Location">
+
+
+    <button class="send" onclick="sendRequest()">
+        Send Request
+    </button>
+
+
+    <button class="logout" onclick="logout()">
+        Logout
+    </button>
+
+</div>
+
+
+<script src="js/api.js"></script>
+
+
+<script>
+
+
+let user = JSON.parse(localStorage.getItem("publicUser"));
+
+
+if(!user){
+
+    window.location.href="public-login.html";
+
+}
+
+
+
+let hospitalId = localStorage.getItem("selectedHospitalId");
+
+
+
+async function sendRequest(){
+
+
+    let data = {
+
+        patientName:
+        document.getElementById("patientName").value,
+
+
+        phone:
+        document.getElementById("phone").value,
+
+
+        pickupLocation:
+        document.getElementById("pickupLocation").value,
+
+
+        hospitalId:
+        Number(hospitalId)
+
+    };
+
+
+
+    if(
+        data.patientName === "" ||
+        data.phone === "" ||
+        data.pickupLocation === ""
+    ){
+
+        alert("Please fill all details.");
+
+        return;
+
+    }
+
+
+
+    try{
+
+
+        await apiRequest(
+
+            "/ambulance/request",
+
+            {
+
+                method:"POST",
+
+                headers:{
+                    "Content-Type":"application/json"
+                },
+
+                body:JSON.stringify(data)
+
+            }
+
+        );
+
+
+
+        alert("Ambulance Request Sent Successfully");
+
+
+
+        window.location.href="search-hospital.html";
+
+
+    }
+
+    catch(error){
+
+
+        console.error(error);
+
+        alert("API Error: " + error.message);
+
+
+    }
+
+
+}
+
+
+
+
+function logout(){
+
+
+    localStorage.removeItem("publicUser");
+
+
+    window.location.href="index.html";
+
+
+}
+
+
+
+</script>
+
+
+</body>
+
+</html>
